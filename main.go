@@ -5,26 +5,21 @@ import (
 	"math/rand"
 	"path/filepath"
 	"time"
+
+	"github.com/xyproto/wallpaper"
 )
 
 func main() {
-	WMs := []WM{
-		&Sway{},
-		&Generic{},
+	imageFilename := ""
+	if matches, err := filepath.Glob("/usr/share/pixmaps/*.png"); err != nil {
+		panic(err)
+	} else {
+		rand.Seed(time.Now().Unix())
+		randomIndex := rand.Int() % len(matches)
+		imageFilename = matches[randomIndex]
 	}
-	for _, wm := range WMs {
-		if wm.ExecutablesExists() && wm.Running() {
-			fmt.Println("WindowManager: " + wm.Name())
-			matches, err := filepath.Glob("/usr/share/pixmaps/*.png")
-			if err != nil {
-				panic(err)
-			}
-			rand.Seed(time.Now().Unix())
-			randomIndex := rand.Int() % len(matches)
-			imageFilename := matches[randomIndex]
-			fmt.Println("Setting background image to: " + imageFilename)
-			wm.SetWallpaper(imageFilename)
-			break
-		}
+	fmt.Println("Setting background image to: " + imageFilename)
+	if err := wallpaper.Set(imageFilename); err != nil {
+		panic(err)
 	}
 }
